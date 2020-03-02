@@ -54,6 +54,18 @@ RUN usermod -aG docker jenkins
 # start on boot
 RUN systemctl enable docker
 
+# get azure stuff
+RUN apt-get update \
+    && apt-get install lsb-release gnupg \
+    && curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null \
+    && add-apt-repository \
+    "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ \
+    $(lsb_release -cs) \
+    main" \
+    && tee /etc/apt/sources.list.d/azure-cli.list \
+    && apt-get update \
+    && apt-get install azure-cli
+
 VOLUME /var/jenkins_home/slave
 WORKDIR /var/jenkins_home/slave
 
